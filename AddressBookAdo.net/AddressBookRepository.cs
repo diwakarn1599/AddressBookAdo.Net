@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
@@ -63,6 +64,56 @@ namespace AddressBookAdo.net
             return output;
 
         }
+
+        /// <summary>
+        /// Update data using stored procedure
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public string UpdateEmailIdUsingStoredProcedure(AddressBookModel model)
+        {
+            string output = string.Empty;
+            try
+            {
+                using (this.connection)
+                {
+                    //sqlcommand object with stored procedure - dbo.UpdateDetails
+                    SqlCommand command = new SqlCommand("dbo.UpdateDetails", connection);
+                    //Setting command type
+                    command.CommandType = CommandType.StoredProcedure;
+                    //Adding values to stored procedures parameters
+                    command.Parameters.AddWithValue("@name", model.firstName);
+                    command.Parameters.AddWithValue("@emailId", model.emailId);
+                    // Opening connection 
+                    connection.Open();
+                    //Executing using non query returns number of rows affected
+                    int res = command.ExecuteNonQuery();
+
+                    if (res >= 1)
+                    {
+                        output = $"Updated {res} rows";
+
+                    }
+                    else
+                    {
+                        output = "Not Updated";
+                    }
+
+                }
+                return output;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return output;
+            }
+            finally
+            {
+                //closing the connection
+                connection.Close();
+            }
+        }
+
 
         /// <summary>
         /// Print details
