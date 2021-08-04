@@ -9,12 +9,13 @@ namespace AddressBookTest
     {
         AddressBookModel model;
         AddressBookRepository repository;
-
+        AddressBookRepositoryEr erRepository;
         [TestInitialize]
         public void Setup()
         {
             model = new AddressBookModel();
             repository = new AddressBookRepository();
+            erRepository = new AddressBookRepositoryEr();
         }
         /// <summary>
         /// Retrive All Data
@@ -73,6 +74,65 @@ namespace AddressBookTest
                 string actual, expected;
                 expected = "Success";
                 actual = repository.RetreiveDataBasedOnStateNameOrCityName(model);
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
+        /// <summary>
+        /// Retrive All Data based on Er diagram
+        /// </summary>
+        [TestMethod]
+        public void TestForRetreiveAllDataEr()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "Success";
+                actual = erRepository.RetreiveAllDataEr(model);
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
+
+        /// <summary>
+        /// Retrive All Data based on Er diagram
+        /// </summary>
+        [TestMethod]
+        public void TestForRetrieveUsingStateNameOrCityEr()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "Success";
+                actual = erRepository.RetreiveAllDataStateNameOrCityEr(model);
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
+
+        /// <summary>
+        /// Sort Based on first name
+        /// </summary>
+        [TestMethod]
+        public void TestForSortByFirstName()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "Success";
+                actual = erRepository.SortBasedOnFirstName(model);
                 Assert.AreEqual(actual, expected);
             }
             catch (Exception ex)

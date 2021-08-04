@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AddressBookAdo.net
 {
-    public class AddressBookRepository
+    public class AddressBookRepositoryEr
     {
         //Connection String
         public static string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AddressBook;Integrated Security=True;";
@@ -15,17 +15,22 @@ namespace AddressBookAdo.net
         SqlConnection connection = new SqlConnection(connectionString);
 
         /// <summary>
-        /// Method to retreive all data from retreive all data
+        /// Method to retreive all data from er diagram
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public string RetreiveAllData(AddressBookModel model)
+        public string RetreiveAllDataEr(AddressBookModel model)
         {
             string output = string.Empty;
             try
             {
                 //Qurey to retreive data
-                string query = "SELECT * FROM Address_Book_Table";
+                string query = @"SELECT ab.AddressBookId,ab.AddressBookName,p.PersonId,p.FirstName,p.LastName,p.Address,p.City,p.StateName,p.ZipCode,
+                                p.PhoneNumber,p.EmailId,pt.PersonType FROM
+                                AddressBook AS ab
+                                INNER JOIN Person AS p ON ab.AddressBookId = p.AddressBookId
+                                INNER JOIN PersonTypesMap as ptm On ptm.PersonId = p.PersonId
+                                INNER JOIN PersonTypes AS pt ON pt.PersonTypeId = ptm.PersonTypeId; ";
                 SqlCommand command = new SqlCommand(query, connection);
                 //Open Connection
                 this.connection.Open();
@@ -66,67 +71,79 @@ namespace AddressBookAdo.net
         }
 
         /// <summary>
-        /// Update data using stored procedure
+        /// Method to retreive all data from er diagram
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public string UpdateEmailIdUsingStoredProcedure(AddressBookModel model)
+        public string RetreiveAllDataStateNameOrCityEr(AddressBookModel model)
         {
             string output = string.Empty;
             try
             {
-                using (this.connection)
+                //Qurey to retreive data
+                string query = @"SELECT ab.AddressBookId,ab.AddressBookName,p.PersonId,p.FirstName,p.LastName,p.Address,p.City,p.StateName,p.ZipCode,
+                                p.PhoneNumber,p.EmailId,pt.PersonType,pt.PersonTypeId FROM
+                                AddressBook AS ab 
+                                INNER JOIN Person AS p ON ab.AddressBookId = p.AddressBookId AND (p.City='Chennai' OR p.StateName='Tn')
+                                INNER JOIN PersonTypesMap as ptm On ptm.PersonId = p.PersonId
+                                INNER JOIN PersonTypes AS pt ON pt.PersonTypeId = ptm.PersonTypeId; ";
+                SqlCommand command = new SqlCommand(query, connection);
+                //Open Connection
+                this.connection.Open();
+                //Returns object of result set
+                SqlDataReader result = command.ExecuteReader();
+                //Check Result set has rows or not
+                if (result.HasRows)
                 {
-                    //sqlcommand object with stored procedure - dbo.UpdateDetails
-                    SqlCommand command = new SqlCommand("dbo.UpdateDetails", connection);
-                    //Setting command type
-                    command.CommandType = CommandType.StoredProcedure;
-                    //Adding values to stored procedures parameters
-                    command.Parameters.AddWithValue("@name", model.firstName);
-                    command.Parameters.AddWithValue("@emailId", model.emailId);
-                    // Opening connection 
-                    connection.Open();
-                    //Executing using non query returns number of rows affected
-                    int res = command.ExecuteNonQuery();
-
-                    if (res >= 1)
+                    //Parse untill  rows are null
+                    while (result.Read())
                     {
-                        output = $"Updated {res} rows";
+                        //Print deatials that are retrived
+                        PrintDetails(result, model);
 
                     }
-                    else
-                    {
-                        output = "Not Updated";
-                    }
-
+                    output = "Success";
                 }
-                return output;
+                else
+                {
+                    //Console.WriteLine("No Records in the table");
+                    output = "Success";
+                }
+                //close result set
+                result.Close();
             }
             catch (Exception ex)
             {
+                //handle exception
                 Console.WriteLine(ex.Message);
-                return output;
             }
             finally
             {
-                //closing the connection
+                //close connection
                 connection.Close();
             }
+            return output;
+
         }
 
         /// <summary>
-        /// Retrive data based on state name or city name 
+        /// Retrive data based on state name or city name er diagram
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public string RetreiveDataBasedOnStateNameOrCityName(AddressBookModel model)
+        public string SortBasedOnFirstName(AddressBookModel model)
         {
             string output = string.Empty;
             try
             {
                 using (this.connection)
                 {
-                    string query = @"Select * from Address_Book_Table where City='chennai' OR StateName='Tn';";
+                    string query = @"SELECT ab.AddressBookId,ab.AddressBookName,p.PersonId,p.FirstName,p.LastName,p.Address,p.City,p.StateName,p.ZipCode,
+                                    p.PhoneNumber,p.EmailId,pt.PersonType,pt.PersonTypeId FROM
+                                    AddressBook AS ab 
+                                    INNER JOIN Person AS p ON ab.AddressBookId = p.AddressBookId
+                                    INNER JOIN PersonTypesMap as ptm On ptm.PersonId = p.PersonId
+                                    INNER JOIN PersonTypes AS pt ON pt.PersonTypeId = ptm.PersonTypeId ORDER BY p.FirstName ;";
                     SqlCommand command = new SqlCommand(query, connection);
                     //Open Connection
                     this.connection.Open();
@@ -161,9 +178,6 @@ namespace AddressBookAdo.net
             return output;
         }
 
-     
-
-
         /// <summary>
         /// Print details
         /// </summary>
@@ -172,19 +186,22 @@ namespace AddressBookAdo.net
         public void PrintDetails(SqlDataReader result, AddressBookModel model)
         {
             //reatreive adata and print details
-            
+            model.addressBookId = Convert.ToInt32(result["AddressBookId"]);
+            model.personId = Convert.ToInt32(result["PersonId"]);
+            model.addressBookName = Convert.ToString(result["AddressBookName"]);
             model.firstName = Convert.ToString(result["FirstName"]);
             model.lastName = Convert.ToString(result["LastName"]);
             model.address = Convert.ToString(result["address"]);
             model.city = Convert.ToString(result["City"]);
             model.stateName = Convert.ToString(result["StateName"]);
             model.zipCode = Convert.ToInt32(result["ZipCode"]);
-            model.phoneNumber = Convert.ToInt64(result["Phonenum"]);
+            model.phoneNumber = Convert.ToInt64(result["PhoneNumber"]);
             model.emailId = Convert.ToString(result["EmailId"]);
-            model.addressBookName = Convert.ToString(result["AdressBookName"]);
-            model.abType = Convert.ToString(result["AbType"]);
-            
-            Console.WriteLine($"{model.firstName},{model.lastName},{model.address},{model.city},{model.stateName},{model.zipCode},{model.phoneNumber},{model.emailId},{model.addressBookName},{model.abType}\n");
+            model.abType = Convert.ToString(result["PersonType"]);
+
+            Console.WriteLine($"{model.addressBookId},{model.personId},{model.firstName},{model.lastName},{model.address},{model.city},{model.stateName},{model.zipCode},{model.phoneNumber},{model.emailId},{model.addressBookName},{model.abType}\n");
         }
+
+
     }
 }
