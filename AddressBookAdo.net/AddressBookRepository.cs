@@ -114,6 +114,52 @@ namespace AddressBookAdo.net
             }
         }
 
+        /// <summary>
+        /// Retrive data based on state name or city name
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public string RetreiveDataBasedOnStateNameOrCityName(AddressBookModel model)
+        {
+            string output = string.Empty;
+            try
+            {
+                using (this.connection)
+                {
+                    string query = @"Select * from Address_Book_Table where City='chennai' OR StateName='Tn';";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    //Open Connection
+                    this.connection.Open();
+                    //Returns object of result set
+                    SqlDataReader result = command.ExecuteReader();
+
+                    //checking result set has rows are not
+                    if (result.HasRows)
+                    {
+                        while (result.Read())
+                        {
+                            //Print deatials that are retrived
+                            PrintDetails(result, model);
+                        }
+                        //close the reader object
+                        result.Close();
+                    }
+                    output = "Success";
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+                output = "Unsuccessfull";
+            }
+            finally
+            {
+                //close the connection
+                connection.Close();
+            }
+            return output;
+        }
 
         /// <summary>
         /// Print details

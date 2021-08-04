@@ -60,5 +60,26 @@ namespace AddressBookTest
             }
 
         }
+
+
+        // <summary>
+        /// Test method to retreive data usin name
+        /// </summary>
+        [TestMethod]
+        public void TestForRetrieveUsingStateNameOrCity()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "Success";
+                actual = repository.RetreiveDataBasedOnStateNameOrCityName(model);
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
     }
 }
