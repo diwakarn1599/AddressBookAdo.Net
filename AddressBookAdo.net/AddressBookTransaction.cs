@@ -115,7 +115,7 @@ namespace AddressBookAdo.net
         }
 
         /// <summary>
-        /// Add date added column
+        ///Retrive data based on range
         /// </summary>
         /// <returns></returns>
         public string RetreiveDataBasedOnDateRange()
@@ -183,6 +183,61 @@ namespace AddressBookAdo.net
             }
             return output;
         }
+
+        /// <summary>
+        /// Insert using transaction
+        /// </summary>
+        /// <returns></returns>
+        public string InsertUsingTransaction()
+        {
+            string output = string.Empty;
+            using (connection)
+            {
+                //open the connection
+                connection.Open();
+                //Begin the transactions
+                SqlTransaction transaction = connection.BeginTransaction();
+                //Create the commit
+                SqlCommand command = connection.CreateCommand();
+                //Set command to transaction
+                command.Transaction = transaction;
+
+                try
+                {
+                    //set command text to command object
+                    command.CommandText = @"INSERT INTO Person VALUES (1,'Isha','Elizabeth','Korattur','Chennai','Tn',600062,98744443210,'asdf@asf.com','2016-09-06')";
+                    //Execute command
+                    command.ExecuteNonQuery();
+                    //set command text to command object
+                    command.CommandText = @"INSERT INTO PersonTypesMap VALUES(1,4)";
+                    //Execute command
+                    command.ExecuteNonQuery();
+                    
+                   
+
+                    //if all executes are success commit the transaction
+                    transaction.Commit();
+                    output = "Success";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    //If any error or exception occurs rollback the transaction
+                    transaction.Rollback();
+                    output = "Unsuccessfull";
+                }
+                finally
+                {
+                    //close the connection
+                    if (connection != null)
+                        connection.Close();
+                }
+                return output;
+            }
+        }
+
+
+
 
         /// <summary>
         /// Print details

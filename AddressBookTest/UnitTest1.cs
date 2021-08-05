@@ -202,5 +202,25 @@ namespace AddressBookTest
             }
 
         }
+
+        /// <summary>
+        /// Insert into table
+        /// </summary>
+        [TestMethod]
+        public void InsertIntoTable()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "Success";
+                actual = transaction.InsertUsingTransaction();
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
     }
 }
