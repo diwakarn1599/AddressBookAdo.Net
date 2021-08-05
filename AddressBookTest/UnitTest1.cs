@@ -10,12 +10,14 @@ namespace AddressBookTest
         AddressBookModel model;
         AddressBookRepository repository;
         AddressBookRepositoryEr erRepository;
+        AddressBookTransaction transaction;
         [TestInitialize]
         public void Setup()
         {
             model = new AddressBookModel();
             repository = new AddressBookRepository();
             erRepository = new AddressBookRepositoryEr();
+            transaction = new AddressBookTransaction();
         }
         /// <summary>
         /// Retrive All Data
@@ -133,6 +135,45 @@ namespace AddressBookTest
                 string actual, expected;
                 expected = "Success";
                 actual = erRepository.SortBasedOnFirstName(model);
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
+
+        /// <summary>
+        /// Add a date added field
+        /// </summary>
+        [TestMethod]
+        public void TestForAddDateAddedField()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "Success";
+                actual = transaction.AlterTableAddDateAdded();
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
+        /// <summary>
+        /// Add a date added field
+        /// </summary>
+        [TestMethod]
+        public void TestForUpdateDateAddedField()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "Success";
+                actual = transaction.UpdateDateAddedCoulmn();
                 Assert.AreEqual(actual, expected);
             }
             catch (Exception ex)
