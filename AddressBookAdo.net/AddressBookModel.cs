@@ -19,7 +19,7 @@ namespace AddressBookAdo.net
         public string addressBookName { get; set; }
         public string abType { get; set; }
 
-
+        public DateTime DateAdded { get; set; }
 
 
     }

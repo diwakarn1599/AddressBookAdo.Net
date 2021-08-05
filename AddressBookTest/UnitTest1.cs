@@ -182,5 +182,25 @@ namespace AddressBookTest
             }
 
         }
+
+        /// <summary>
+        /// Retreive by date range
+        /// </summary>
+        [TestMethod]
+        public void TestForRetreiveByDateRange()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "Success";
+                actual = transaction.RetreiveDataBasedOnDateRange();
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
     }
 }

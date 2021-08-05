@@ -107,7 +107,7 @@ namespace AddressBookAdo.net
                 else
                 {
                     //Console.WriteLine("No Records in the table");
-                    output = "Success";
+                    output = "UnSuccess";
                 }
                 //close result set
                 result.Close();
