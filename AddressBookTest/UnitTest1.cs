@@ -222,5 +222,25 @@ namespace AddressBookTest
             }
 
         }
+        /// <summary>
+        /// Test method for retreive multiple data from database and retrive into the table
+        /// </summary>
+        /// 
+        [TestMethod]
+        public void TestForRetreiveAndAddMultipleDataToList()
+        {
+            try
+            {
+                string actual, expected;
+                expected = "success";
+                actual = transaction.RetreiveDataUsingThread();
+                Assert.AreEqual(actual, expected);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
     }
 }

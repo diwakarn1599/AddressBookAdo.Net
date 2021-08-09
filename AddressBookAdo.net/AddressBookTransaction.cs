@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Threading;
 
 namespace AddressBookAdo.net
 {
@@ -13,7 +15,7 @@ namespace AddressBookAdo.net
 
         //SqlConnection
         SqlConnection connection = new SqlConnection(connectionString);
-
+        List<AddressBookModel> addressBookModels = new List<AddressBookModel>();
         /// <summary>
         /// Add date added column
         /// </summary>
@@ -235,8 +237,63 @@ namespace AddressBookAdo.net
                 return output;
             }
         }
-
-
+        /// <summary>
+        /// Rtereive and add multiple data to the list
+        /// </summary>
+        public void RetreiveAndAddMultipleDataToList()
+        {
+            try
+            {
+                string query = @"SELECT ab.AddressBookId,ab.AddressBookName,p.PersonId,p.FirstName,p.LastName,p.Address,p.City,p.StateName,p.ZipCode,p.DateAdded,
+                                p.PhoneNumber,p.EmailId,pt.PersonType FROM
+                                AddressBook AS ab
+                                INNER JOIN Person AS p ON ab.AddressBookId = p.AddressBookId
+                                INNER JOIN PersonTypesMap as ptm On ptm.PersonId = p.PersonId
+                                INNER JOIN PersonTypes AS pt ON pt.PersonTypeId = ptm.PersonTypeId;";
+                SqlCommand sqlCommand = new SqlCommand(query, this.connection);
+                connection.Open();
+                SqlDataReader result = sqlCommand.ExecuteReader();
+                if (result.HasRows)
+                {
+                    while (result.Read())
+                    {
+                        //Print deatials that are retrived
+                        PrintDetails(result);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            connection.Close();
+        }
+        /// <summary>
+        /// method to retreive data and calculate time using thread
+        /// </summary>
+        /// <returns></returns>
+        public string RetreiveDataUsingThread()
+        {
+            string output = string.Empty;
+            try
+            {
+                //object for stopwatch
+                Stopwatch stopWatch = new Stopwatch();
+                //start the stopwatch
+                stopWatch.Start();
+                RetreiveAndAddMultipleDataToList();
+                //stop stopwatch
+                stopWatch.Stop();
+                Console.WriteLine($"Duration : {stopWatch.ElapsedMilliseconds} milliseconds");
+                output = "success";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                output = "unsuccessfull";
+            }
+            return output;
+        }
 
 
         /// <summary>
@@ -246,23 +303,36 @@ namespace AddressBookAdo.net
         /// <param name="model"></param>
         public void PrintDetails(SqlDataReader result)
         {
-            AddressBookModel model = new AddressBookModel();
-            //reatreive adata and print details
-            model.addressBookId = Convert.ToInt32(result["AddressBookId"]);
-            model.personId = Convert.ToInt32(result["PersonId"]);
-            model.addressBookName = Convert.ToString(result["AddressBookName"]);
-            model.firstName = Convert.ToString(result["FirstName"]);
-            model.lastName = Convert.ToString(result["LastName"]);
-            model.address = Convert.ToString(result["address"]);
-            model.city = Convert.ToString(result["City"]);
-            model.stateName = Convert.ToString(result["StateName"]);
-            model.zipCode = Convert.ToInt32(result["ZipCode"]);
-            model.phoneNumber = Convert.ToInt64(result["PhoneNumber"]);
-            model.emailId = Convert.ToString(result["EmailId"]);
-            model.abType = Convert.ToString(result["PersonType"]);
-            model.DateAdded = (DateTime)result["DateAdded"];
+            try
+            {
+                AddressBookModel model = new AddressBookModel();
+                //reatreive adata and print details
+                model.addressBookId = Convert.ToInt32(result["AddressBookId"]);
+                model.personId = Convert.ToInt32(result["PersonId"]);
+                model.addressBookName = Convert.ToString(result["AddressBookName"]);
+                model.firstName = Convert.ToString(result["FirstName"]);
+                model.lastName = Convert.ToString(result["LastName"]);
+                model.address = Convert.ToString(result["address"]);
+                model.city = Convert.ToString(result["City"]);
+                model.stateName = Convert.ToString(result["StateName"]);
+                model.zipCode = Convert.ToInt32(result["ZipCode"]);
+                model.phoneNumber = Convert.ToInt64(result["PhoneNumber"]);
+                model.emailId = Convert.ToString(result["EmailId"]);
+                model.abType = Convert.ToString(result["PersonType"]);
+                model.DateAdded = (DateTime)result["DateAdded"];
+                Thread thread = new Thread(() =>
+                {
+                    Console.WriteLine($"{model.addressBookId},{model.personId},{model.firstName},{model.lastName},{model.address},{model.city},{model.stateName},{model.zipCode},{model.phoneNumber},{model.emailId},{model.DateAdded},{model.addressBookName},{model.abType}\n");
+                    addressBookModels.Add(model);
+                });
 
-            Console.WriteLine($"{model.addressBookId},{model.personId},{model.firstName},{model.lastName},{model.address},{model.city},{model.stateName},{model.zipCode},{model.phoneNumber},{model.emailId},{model.DateAdded},{model.addressBookName},{model.abType}\n");
+                thread.Start();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
         }
 
     }
